@@ -214,7 +214,8 @@ function pushToServer(id,score){
 	// No Server Now
 	let time = new Date().toLocaleString();
 	let serverAddress = gp_store.state.server_address;
-	
+	/* 
+	// io静态网页版禁用计分功能
 	$(document).ready(function () {
 		$.get(serverAddress,{userId:id,userScore:score},function(result,stat){
 			if(stat!='success'){
@@ -229,7 +230,7 @@ function pushToServer(id,score){
 				});
 			}
 		});
-	});
+	});*/
 }
 // initGame() Begin: //
 // 卡牌堆 x 11

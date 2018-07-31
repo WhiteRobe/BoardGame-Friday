@@ -418,9 +418,9 @@ function countScore(){
 	return skill_loss*diff*(fightScore+ageScore+pirateScore+healthScore+discardHazardScore);
 }
 // 音乐播放组件
-var myAudio = new Audio();
+var myAudio = new Audio();
 var playAudio = function(){
-	var arr = [ "./res/audio/2-03 Peaceful Moment.ogg",
+	var arr = [ "./res/audio/2-03 Peaceful Moment.ogg",
 				"./res/audio/05 305 - Heresy (Organ, Loop).ogg",
 				"./res/audio/3-06 Cool Stuff.ogg",
 				"./res/audio/01 300-A - Desecrated Temple.ogg",
@@ -439,7 +439,7 @@ var playAudio = function(){
 		myAudio.play();
 		if(gp_store.state.debug)console.log('Now Play Audio:'+myAudio.src);
 		if(arr.length==0){ // 循环播放设置
-			arr = [ "./res/audio/2-03 Peaceful Moment.ogg",
+			arr = [ "./res/audio/2-03 Peaceful Moment.ogg",
 				"./res/audio/05 305 - Heresy (Organ, Loop).ogg",
 				"./res/audio/2-03 291-C - Night 2.ogg",
 				"./res/audio/3-06 Cool Stuff.ogg",

@@ -1,0 +1,367 @@
+<script>
+function isIE(){
+	if(!+[1,]){// 不支持IE，如果是IE直接跳转到谷歌Chrome
+		alert('游戏需要Vue/jQuery/Bootstrap的支持。\n推荐您使用"Google Chrome"最新版本打开游戏。');
+		window.location.href='https://www.google.cn/chrome/';
+	}
+}
+isIE();
+</script>
+<html>
+<head>
+<meta charset="utf-8">
+<title>星期五 · Made by 身披白袍</title>
+<link rel="stylesheet" href="./script/css/bootstrap.min.css">
+<link rel="stylesheet" href="./script/css/jquery.growl.css">
+<link rel="stylesheet" href="./script/css/gamestyle.css">
+<script src="./script/js/frame/vue.min.js"></script>
+<script src="./script/js/frame/vuex.js"></script>
+<script src="./script/js/frame/jquery.min.js"></script>
+<script src="./script/js/frame/bootstrap.min.js"></script>
+<script src="./script/js/frame/jquery.growl.js"></script>
+<script src="./script/js/game/gameobj.js"></script>
+<script src="./script/js/game/component.js"></script>
+<script src="./script/js/game/params.js"></script>
+<script src="./script/js/game/card.data.js"></script>
+<script src="./script/js/game/skill.js"></script>
+<script src="./script/js/game/gamectrl.js"></script>
+<style>
+#growls.default {
+	top: 11%!important;
+	right: 40%!important;
+}
+.modal{
+	top:18%!important;
+}
+</style>
+</head>
+<body style="padding-top:60px">
+<div class="container">
+	<!--导航栏Begin-->
+	<div class="row clearfix">
+		<div class="col-md-12 column" id='navbarview'>
+			<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+				<div class="navbar-header">
+					 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+						 <span class="sr-only">切换导航样式</span>
+						 <span class="icon-bar"></span>
+						 <span class="icon-bar"></span>
+						 <span class="icon-bar"></span>
+					 </button>
+					 <a class="navbar-brand" target="_blank" href="https://www.boardgamegeek.com/boardgame/43570/friday" style='color:#336699;font-weight:bold'>《星期五》</a>
+				</div>
+				
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="#" :style='{color:getLifeColor}'>生命值:{{running_life}}</a></li>
+						<li><a href="#" :style="{color:getPhaseColor}">当前阶段:{{running_phase}}</a></li>
+						<li><a href="#" :style="{color:getDiffColor}">游戏难度:{{running_diff}}</a></li>
+						<li class="dropdown">
+							 <a href="#" class="dropdown-toggle" data-toggle="dropdown">查看资料<strong class="caret"></strong></a>
+							<ul class="dropdown-menu">
+								<li><a href="#" data-toggle="modal" data-target="#jifenModal">记分规则</a></li>
+								<li><a target="_blank" href="./res/img/">卡牌总览</a></li>
+								<li><a href="#" data-toggle="modal" data-target="#versionModal">版本信息</a></li>
+								<li class="divider"></li>
+								<li><a href="./res/FridayRulesSCh.pdf" target="_blank" style='color:#CC99CC'>中文说明书</a></li>
+							</ul>
+						</li>
+						<li><a href="#" style="color:#FFE4E1" v-show='cheat' @click="dec1Health">减1血</a></li>
+						<li><a href="#" style="color:#FFE4E1" v-show='cheat' @click="addHealth">加血</a></li>
+						<li><a href="#" style="color:#FFE4E1" v-show='cheat' @click="decPhase">减回合</a></li>
+						<li><a href="#" style="color:#FFE4E1" v-show='cheat' @click="addPhase">加回合</a></li>
+						<li><a href="#" style="color:#FFE4E1" v-show='cheat' @click="add5Fight">加5战斗力</a></li>
+						<li><a href="#" style="color:#FFE4E1" v-show='cheat' @click="log">输出参数</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							 <a href="https://blog.csdn.net/shenpibaipao" style='color:#FF9966' target="_blank">联系作者</a>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">【游戏设置】<strong class="caret"></strong></a>
+							<ul class="dropdown-menu">
+								<li><a href="#" style="color:#8FBC8F" @click="musicOn">音乐开关</a></li>
+								<li><a href="#" style="color:#CCCC99" @click="cheatOn">控制台调试</a></li>
+								<li class="divider"></li>
+								<li><a href="#" style="color:red" onclick='resetGame();'>重启游戏</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</div>
+	</div>
+	<!--导航栏End-->
+	
+	<!--开始游戏界面Begin-->
+	<div id='gamesetview' class="row clearfix" v-show='g_round<=2'>
+		<div class="col-md-12 column well">
+			<div v-show="g_round==1">
+				<p style='text-align:center' title="BBG Rating 7.2(2011) 复杂度:2.13/5">
+					<b>欢迎来到平均24分钟一局的单人桌面游戏——<a target="_blank" href="https://www.boardgamegeek.com/boardgame/43570/friday">《星期五》</a>！</b>
+				</p>
+				<hr style="height:1px;border:none;border-top:1px solid silver;"/>
+				<pre style="border-top-left-radius: 15px; text-align:center"><b style="font-size:18px">游戏说明</b></br>如果您是第一次游玩，可以先查阅相关的<a target="_blank" href="./res/FridayRulesSCh.pdf">说明书和教程</a>，并仔细查看下方的规则修订。</br>游戏过程中，如果有部分说明没看清，可以按F12查看控制台日志输出。</br>同时，为了游戏更刺激、卡牌的养成及连击更有趣，我们基于BGG上的一些规则进行了适当采用，并作出了修正。</br>游戏各类素材均取自BGG，并在版本信息中给出了具体的地址。</br></br><b style="color:#8A2BE2">本应用仅供学习及个人娱乐，不得应用于商业用途。如果喜欢，请购买正版实体桌游。</b></br><small style="color:gray">当前游戏版本:{{version}}</small></pre>
+				<hr style="height:1px;border:none;border-top:1px solid silver;"/>
+				<b>当前游戏版本规则修改: </b><small style="color:gray"> version:{{version}}</small></br></br>
+				<div style="overflow:scroll; height:235px;overflow-x:hidden"><ul>
+					<li>背景调整:鲁滨逊的年龄从40岁起，卡堆中每多/少一张衰老卡便加/减一岁，直到52岁。</li>
+					<li>卡牌组成:本游戏所用牌张与说明书中的牌张清单略有不符，按照<a target="_blank" href="./res/img/">图片素材</a>为准。</li>
+					<li>卡牌技能:[Destory]无法对已使用过的卡牌进行使用(衰老卡除外)。</li>
+					<li>卡牌技能:[Copy]无法对已使用过技能的卡牌及[Copy]进行技能复制。</li>
+					<li>卡牌技能:多张[Double]可以对一张未使用过技能的卡牌进行多次加倍(但只加倍其原有值)。</li>
+					<li>卡牌技能:[Double]在一张技能卡被使用前对其进行加倍，该技能卡使用后加倍效果不消失。</li>
+					<li>卡牌技能:[Only Half Card Count]精简为将鲁滨逊的战斗力减半。</li>
+					<li>卡牌技能:只有[Exchange]和[Double]可以对已使用过技能的卡牌进行使用。</li>
+					<li>海盗调整:为了游戏更有趣，海盗卡均有或多或少的技能修正，并加入了<a href="#" data-toggle="modal" data-target="#newSkillModal">新的海盗</a>，以游戏内实际提示为准。</li>
+					<li>游戏调整:为了搭配上一条的海盗调整，当无灾难卡可抽取或第3阶段时灾难卡堆中不足2张时，将直接开启海盗阶段。</li>
+					<li style="color:#009966">难度优化:鲁滨逊的血量上限不再是22点，而是30点。</li>
+					<li style="color:#009966">难度优化:每回合中，最终战斗力超过所需战斗力5点(含)以上，恢复1点生命值。</li>
+					<li style="color:#009966">难度优化:每回合中，鲁滨逊挑战灾难成功后，将会恢复1点生命值。</li>
+					<li style="color:#009966">难度优化:每阶段结束后，鲁滨逊会根据游戏难度，恢复一定生命值。</li>
+					<li style="color:#DC143C">注意事项:每回合中，支付额外生命值抽取卡牌所支付的数值无法用于摧毁卡牌。</li>
+					<li style="color:#DC143C">注意事项:请在抽取完所有免费战斗卡牌后再使用[+x Card]，否则技能所得卡牌其也将被记入已抽免费卡牌中。</li>
+					<li style="color:#FF9900">游戏特性:衰老卡一旦被抽取到，其特技将立即发动。</li>
+					<li style="color:#FF9900">游戏特性:为了鼓励高难度游戏，不同的难度将会有不同的得分修正系数(详细请查看"记分规则")。</li>
+					<li style="color:#FF9900">游戏特性:向着硬核进发，引入"技能损耗"的概念，即使用技能卡后会造成该卡[战力值x损耗倍数N]的战力衰减。</li>
+					<li style="color:#FF9900">游戏特性:游戏不区分免费和额外战斗卡牌的左右，仅以可见顺序判断其是否属于免费卡牌，这个新特性是我们故意引入的，目的是创造更多的Combo。</li>
+				</div></ul>
+				<a onclick="alert('没有历史版本')"><small style="color:#CCCCCC">&#10174查看历史版本游戏规则</small></a>
+				<hr style="height:1px;border:none;border-top:1px solid silver;"/>
+				<p style='text-align:center'>
+					<button type="button" class="btn btn-primary" @click='g_round_inc'>开始游戏</button>
+				</p>
+				<hr style="height:1px;border:none;border-top:1px solid silver;" v-show='false'/>
+				<p style='text-align:center' v-show='false'>
+					<b style="color:#D8BFD8">游戏音乐:</b></br>
+					<audio id='audioBox' controls="controls">浏览器不支持HTML5，无法播放音乐</audio>
+				</p>
+			</div>
+			<p style='text-align:center' v-show="g_round==2">
+				<b>请选择<u :title='diff_tips.c_diffmore'>难度</u>:</b></br></br>
+					<diff-card-img y='0' x='4' diff='green' :message='diff_tips.c_diff01'></diff-card-img>
+					<diff-card-img y='1' x='4' diff='yellow' :message='diff_tips.c_diff02'></diff-card-img>
+					<diff-card-img y='2' x='4' diff='red' :message='diff_tips.c_diff03'></diff-card-img>
+					<diff-card-img y='0' x='5' diff='orange' :message='diff_tips.c_diff04'></diff-card-img>
+				</br></br>
+				<b style="color:gray">技能损耗(0起正整数):</b></br></br>
+				<input title="(0起正整数)" id="skl" type="text" v-model="skill_loss_input" class="form-control" >
+			</p>
+			<!--难度说明表格Begin-->
+			<hr style="height:1px;border:none;border-top:1px solid silver;" v-show="g_round==2"/>
+			<p style='text-align:center' v-show="g_round==2">	
+				<table class="table table-hover table-bordered">
+					<caption style='text-align:center'>难度说明</caption>
+					<thead>
+						<tr>
+							<th style='text-align:center'>难度等级</th>
+							<th style='text-align:center'>任务描述</th>
+						</tr>
+					</thead>
+					<tbody style='text-align:center'>
+						<tr style='color:green'>
+							<td>1</td>
+							<td>{{diff_tips.c_diff01}}</td>
+						</tr>
+						<tr style='color:#DAA520'>
+							<td>2</td>
+							<td>{{diff_tips.c_diff02}}</td>
+						</tr>
+						<tr style='color:red'>
+							<td>3</td>
+							<td>{{diff_tips.c_diff03}}</td>
+						</tr>
+						<tr style='color:#FF6600'>
+							<td>4</td>
+							<td>{{diff_tips.c_diff04}}</td>
+						</tr>
+						<tr style='color:gray'>
+							<td>...</td>
+							<td>{{diff_tips.c_diffmore}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</p>
+			<!--难度说明表格End-->
+		</div>
+	</div>
+	<!--开始游戏界面End-->
+	
+	<!--游戏进行界面Begin-->
+	<div class="row clearfix" id='gamingview' v-show='g_round==3' style='border:5px solid #FFA07A;'>
+		<!--左主游戏区界面-->
+		<div class="col-md-8 column well">
+			<div>
+				<h2 :title="'年龄:'+(40+robinson_age)">鲁滨逊<!--年龄-->:<small>准备迎接挑战！</small>
+				<small v-show="highest_card_zero" style="color:red">当前最高卡牌战力值为:0!</small>
+				<small v-show="phase_adjust!=0" style="color:#FFD700">当前游戏阶段 {{phase_adjust}} !</small>
+				<small v-show="tired_adjust!=1" style="color:#663366">额外抽卡需要多支付 {{tired_adjust-1}} 点生命值!</small>
+				<small v-show="robinson_adjust!=1" style="color:#228B22">鲁滨逊战斗力倍数x{{robinson_adjust}} !</small>
+				<small v-show="each_card_plus!=0" style="color:#6699CC">每张战斗力卡加 {{each_card_plus}} 点!</small>
+				<small v-show="!can_pick" style="color:#CC9933">鲁滨逊无法继续抽取战斗卡!</small>
+				<small v-show="thorns_injury" style="color:#FF6666">鲁滨逊将受到来自海盗的<u title="等于你已打出的战斗卡数目">荆棘伤害!</u></small>
+				</h2>
+				<hr style="height:1px;border:none;border-top:1px solid silver;"/>
+			</div>
+			<div class="tabbable">
+				<ul class="nav nav-tabs">
+					<li class="active">
+						 <a href="#panel-gaming" data-toggle="tab"><b style='color:#1E90FF'>游戏区</b></a>
+					</li>
+					<li>
+						 <a href="#panel-discard" data-toggle="tab"><b style='color:#669933'>弃牌堆</b></a>
+					</li>
+					<li>
+						 <a href="#panel-destroy" data-toggle="tab"><b style='color:#FF9999'>废牌堆</b></a>
+					</li>
+					<li>
+						 <a href="#panel-pirate" data-toggle="tab"><b style='color:#330033'>来袭海盗</b></a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="panel-gaming" style="overflow:scroll; height:490px;overflow-x:hidden">
+						<p style='text-align:center'>
+							<!--Table区-->
+							<robinson-card-img v-for='(c,index) in table_deck' :key='index' :card='c'></robinson-card-img>
+						</p>
+					</div>
+					<div class="tab-pane" id="panel-discard" style="overflow:scroll; height:490px;overflow-x:hidden">
+						<p style='text-align:center'>
+							</br><b>这是弃牌堆(已使用过的卡牌)。请选择：</b></br></br>
+							<div class="tabbable">
+								<ul class="nav nav-tabs">
+									<li class="active">
+										 <a href="#panel-discard-robinson" data-toggle="tab"><b style='color:#66CC99'>鲁滨逊</b></a>
+									</li>
+									<li>
+										 <a href="#panel-discard-hazard" data-toggle="tab"><b style='color:#993333'>灾难 </b></a>
+									</li>
+								</ul>
+								<div class="tab-content">
+									<div class="tab-pane active" id="panel-discard-robinson">
+										<p style='text-align:center'>
+											<!--$鲁滨逊弃牌。--></br>
+											<junk-card-img v-for='(c,index) in discard_deck' :key='index' :card='c'></junk-card-img>
+										</p>
+									</div>
+									<div class="tab-pane" id="panel-discard-hazard">
+										<p style='text-align:center'>
+											<!--$灾难弃牌。--></br>
+											<junk-card-img v-for='(c,index) in discard_hazard_deck' :key='index' :card='c'></junk-card-img>
+										</p>
+									</div>
+								</div>
+							</div>
+						</p>
+					</div>
+					<div class="tab-pane" id="panel-destroy" style="overflow:scroll; height:490px;overflow-x:hidden">
+						<p style='text-align:center'>
+							</br><b>这是废牌堆(卡牌已被移除游戏)。</b></br></br>
+							<junk-card-img v-for='(c,index) in destory_deck' :key='index' :card='c'></junk-card-img>
+						</p>
+					</div>
+					<div class="tab-pane" id="panel-pirate" style="overflow:scroll; height:490px;overflow-x:hidden">
+						<p style='text-align:center'>
+							<b></br>来势汹汹的海盗：</br></br></b>
+							<show-card-img v-for='(c,index) in pirate_deck' :key='index' :card='c'></show-card-img>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--右主游戏区界面-->
+		<div class="col-md-4 column well">
+			<div>
+				<h2>挑战:<small>[{{hazard.getName()}}]</small></h2>
+				<hr style="height:1px;border:none;border-top:1px solid silver;"/>
+				需要战斗力:<b style='color:#DC143C'>{{hazard.getHardToBeat(g_phase+phase_adjust)}}</b></br>
+				已有战斗力:<b style='color:#009966'>{{(countValueSum(table_deck)-skill_loss*countValueSum(special_deck)+fight_adjust+each_card_plus*(table_deck.length-skill_loss*special_deck.length)-(highest_card_zero?max_card_value:0))*robinson_adjust}}</b></br>
+				<hr style="height:1px;border:none;border-top:1px solid silver;"/>
+				<p style='text-align:center'>
+					<hazard-card-img></hazard-card-img><!--正在挑战的灾难卡-->
+				</p>
+				<hr style="height:1px;border:none;border-top:1px solid silver;"/>
+				<p style='text-align:center'>
+					<button type="button" class="btn btn-warning" v-show='special!=undefined' @click='useSpecial'>使用卡牌特技</button>
+					<button type="button" class="btn btn-primary" @click='pickRobinson' v-show='can_pick'>抽取战斗卡</button>
+					<button type="button" class="btn btn-danger" @click='stopFight'>结束战斗/结算</button>
+					</br></br>
+					<b class="text-success" v-show='table_deck.length<this.free_card'>精力充沛，抽取战斗卡将不消耗生命值</b>
+					<b class="text-danger" v-show='table_deck.length>=this.free_card'>您已疲劳，继续战斗卡将会减{{1*tired_adjust}}生命值！</b>
+				</p>
+				<hr style="height:1px;border:none;border-top:1px solid silver;"/>
+				<p style='text-align:center'>
+				<b>鲁滨逊卡堆中尚有卡牌:<b style='color:#009966'>{{robinson_deck.length}}</b></b>
+				<b style="color:#C71585" v-if='g_phase>=4'></br>！！！海盗袭击中！！！</b>
+				<b style="color:#DC143C" v-else-if='hazard_deck.length<2 && (g_phase>=3 || discard_hazard_deck.length<2)'></br>！！！海盗即将来袭！！！</b><!--要抽 && (三阶段之后||弃牌堆中灾难卡不够2张)-->
+				<b v-else></br>灾难卡堆中尚有卡牌:<b style='color:#FF00FF'>{{hazard_deck.length}}</b></b>
+				</p>
+			</div>
+		</div>
+	</div>
+	<!--游戏进行界面End-->
+	
+	<!--模态框Begin-->
+	<div id='gameModalView'>
+		<!--计分板modal-->
+		<bootstrap-text-modal modalid='jifenModal' modaltitle='记分规则'>
+			<jifen-table slot='body'></jifen-table>
+		</bootstrap-text-modal>
+		<!--版本信息-->
+		<bootstrap-text-modal modalid='versionModal' modaltitle='版本信息'>
+			<version-table slot='body'></version-table>
+		</bootstrap-text-modal>
+		<!--新卡牌信息-->
+		<bootstrap-text-modal modalid='newSkillModal' modaltitle='新卡牌技能'>
+			<new-skill-table slot='body'></new-skill-table>
+		</bootstrap-text-modal>
+		<!--灾难二选一-->
+		<bootstrap-select-modal modalid='selectHazradModal' modaltitle='请选择灾难卡' canmiss='false' comfirmmsg='此处不应显示'>
+			<p style='text-align:center' slot='body'>
+				<choose-hazard-card-img v-for='(c,index) in select_show_deck' :key='index' :card='c'></choose-hazard-card-img>
+			</p>
+		</bootstrap-select-modal>
+		<!--添加卡牌:简单显示卡牌界面-->
+		<bootstrap-select-modal modalid='selectAddCardModal' modaltitle='请选择抽取卡牌[至多两张]' canmiss='true' comfirmmsg='继续'>
+			<p style='text-align:center' slot='body'>
+				<show-card-img v-for='(c,index) in select_show_deck' :key='index' :card='c'></show-card-img>
+			</p>
+		</bootstrap-select-modal>
+		<!--带有目标的卡牌选择界面-->
+		<bootstrap-select-modal modalid='chooseCardModal' modaltitle='请选择目标卡牌' canmiss='true' comfirmmsg='继续'>
+			<p style='text-align:center;overflow:scroll;height:267px;overflow-x:hidden' slot='body'>
+				<select-card-img v-for='(c,index) in filtedDeck(select_show_deck).getDeck()' :key='index' :card='c'></select-card-img>
+			</p>
+		</bootstrap-select-modal>
+		<!--带有输入框的卡牌选择界面-->
+		<bootstrap-input-modal modalid='typeCardModal' modaltitle='请依次决定目标卡牌的值' canmiss='true' comfirmmsg='继续'>
+			<p style='text-align:center;height:290px;' slot='body'>
+				<select-card-img v-for='(c,index) in select_show_deck' :key='index' :card='c'></select-card-img>
+				</br></br>
+				<input type="text" v-model="inputvalue" class="form-control" id="name" placeholder="请输入值">
+			</p>
+		</bootstrap-input-modal>
+		<!--选择要废弃(Destory)的卡牌的界面-->
+		<bootstrap-destory-modal modalid='destoryCardModal' >
+			<p style='text-align:center;overflow:scroll;height:267px;overflow-x:hidden' slot='body'>
+				<select-card-img v-for='(c,index) in select_show_deck' :key='index' :card='c'></select-card-img>
+			</p>
+		</bootstrap-destory-modal>
+	</div>
+	<!--模态框End-->
+</div>
+<jifen-table></jifen-table>
+</body>
+<script src='./script/js/game/vue.game.driver.js'></script>
+<script>
+	warn_green('游戏加载成功!','建议您全屏游玩，如果当前页面出现乱码，请将字符集设为UTF-8。最后，祝您游戏愉快!');
+	//Vue.config.silent = true;
+	window.onload = playAudio();
+	// 调试时用的作弊函数
+	function gamacheat(){
+		// To do
+		//pirateDeck.cleanDeck();
+		//pirateDeck.addCard(c_pirate13);
+		//pirateDeck.addCard(c_pirate15);
+	}
+</script>

@@ -7,7 +7,7 @@
 不过能玩就行。
 
 #### 游戏运行在gitee.io
-[点此可进行游戏](https://shenpibaipao.gitee.io/board_game_friday/)
+[点此可进行游戏](https://shenpibaipao.gitee.io/board_game_friday/)(建议使用Chrome)
 
 io地址：[https://shenpibaipao.gitee.io/board_game_friday/](https://shenpibaipao.gitee.io/board_game_friday/)
 

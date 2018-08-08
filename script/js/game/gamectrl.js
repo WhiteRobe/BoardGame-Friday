@@ -13,16 +13,16 @@ doWhenChoosedDiff()   <───┘              │
 gameStart()                              │
     │                                    │
 	v                                    │
-gameCheat()	 ─·─·─·>─·roundStart() <──┐  ^ 
+gameCheat()	 ─·─·─·>  roundStart() <──┐  ^ 
     │                     │           │  │
     │    (init)           v           │  │
     └─>:选择灾难──> prepareHazard()   │  │
                           │           │  │	
 	           (setHazard)│           │  │	
-pirateAttack()     <──────┤           │  │	
+pirateAttack()  <·─·─·─·─·┤           │  │	
 	│                     │           │  │
-	│                     │           │  │	
-	v                     │           │  │							  
+	└──> {isPhaseEnd?phaseEnd():pass} │  │	
+	                      │           │  │							  
 :gameProcessing    <──────┘           │  │
     │(结算stopFight())                │  │
 	│                                 │  │	
@@ -30,9 +30,8 @@ pirateAttack()     <──────┤           │  │
     ├─┬───────>─────────────:LOOP─────┤  │
 	│ │                               │  │
 	│ │   (损失生命值)                │  │
-    │ └─>:destroyCard()─>───:LOOP──>──┤  │
-	│         │                       │  │	
-    │         └─> phaseEnd() ──────>──┘  │
+    │ └─>:destroyCard()─>───:LOOP──>──┘  │
+    │                                    │
 	v                                    │
 gameEnd()  ───────>───pushToServer()─────┘
 */

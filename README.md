@@ -11,4 +11,5 @@
 
 # 在线体验(建议使用Chrome)
 gitee.io地址：[https://shenpibaipao.gitee.io/board_game_friday/](https://shenpibaipao.gitee.io/board_game_friday/)
+
 github.io地址：[https://whiterobe.github.io/BoardGame-Friday/](https://whiterobe.github.io/BoardGame-Friday/)

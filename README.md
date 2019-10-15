@@ -1,5 +1,7 @@
 # 桌游-星期五
 
+[![DOI](https://zenodo.org/badge/193204235.svg)](https://zenodo.org/badge/latestdoi/193204235)
+
 #### 项目介绍
 《桌游-星期五》是一个基于Vue及其插件、Bootstrap、jQuery的单页面应用项目。
 
